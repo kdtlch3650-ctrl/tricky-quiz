@@ -86,3 +86,18 @@
 - 관리자 페이지를 통한 문제 검토 및 승인
 - 카테고리별 난이도 조절
 - 퀴즈 결과 기반 간단한 통계 제공
+
+## 12. 연결 링크
+
+- 요구사항 명세서 
+https://docs.google.com/spreadsheets/d/1KPJ_9YYDqnzsyehJ1-3U9esVwqNnbyYsiAjQ9bHbCH4/edit?usp=sharing
+- 화면 설계
+https://www.figma.com/design/JzKnADCUhdFHORv541y0DP/tricky-quiz-%ED%99%94%EB%A9%B4%EC%84%A4%EA%B3%84?node-id=0-1&t=LDMm76jVqBf9Zmsc-1
+- 메뉴트리
+https://www.figma.com/board/LLE8nVUt3aERqy6TJOrVHw/%EB%A9%94%EB%89%B4-%ED%8A%B8%EB%A6%AC?node-id=0-1&t=tFt6oiVYzyM4z7YK-1
+- 사용자 유저플로우
+https://www.figma.com/board/WdNGANEuOwlQHiOKIhcYk6/%EC%A0%9C%EB%AA%A9-%EC%97%86%EC%9D%8C?node-id=0-1&t=TrKYB9GXMxTmnX0B-1
+- ERD
+https://drive.google.com/file/d/1Skwmrr6G4MO5LNRt_-wZ00GbTrfBXWcg/view?usp=sharing
+- 테이블명세서
+https://docs.google.com/spreadsheets/d/1LcSbtoZYwTN2SffkXg9lTdyw1kV6wSQjgHjYmQSTzRI/edit?usp=sharing
