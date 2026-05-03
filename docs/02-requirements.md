@@ -182,3 +182,6 @@
 | 필수 | 초기 버전에서 반드시 구현해야 하는 항목 | Google 로그인, 사용자 저장, 카테고리 선택, 문제 조회, 퀴즈 풀이, 정답 확인, 결과 저장, 랭킹 조회, Docker DB 실행, README |
 | 선택 | 초기 버전 이후 추가할 수 있는 항목 | 문제 난이도 구분, 카테고리 추가, 사용자별 플레이 기록 상세 조회, 퀴즈 결과 기반 간단한 통계 |
 | 제외 | 초기 버전 범위에서 구현하지 않는 항목 | 관리자 페이지, OpenAI 문제 생성, 실시간 대전, 여러 소셜 로그인 동시 지원 |
+
+## 요구사항 정의서 링크
+https://docs.google.com/spreadsheets/d/1KPJ_9YYDqnzsyehJ1-3U9esVwqNnbyYsiAjQ9bHbCH4/edit?usp=sharing
