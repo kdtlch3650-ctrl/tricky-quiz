@@ -88,3 +88,6 @@
 - 초기 버전에서는 관리자 메뉴를 제공하지 않습니다.
 - 초기 버전에서는 OpenAI 문제 생성 메뉴를 제공하지 않습니다.
 - 라우팅 경로는 구현 과정에서 프론트엔드 라우터 구조에 맞게 조정될 수 있습니다.
+
+## 메뉴트리 링크
+https://www.figma.com/board/LLE8nVUt3aERqy6TJOrVHw/%EB%A9%94%EB%89%B4-%ED%8A%B8%EB%A6%AC?node-id=0-1&t=tFt6oiVYzyM4z7YK-1
