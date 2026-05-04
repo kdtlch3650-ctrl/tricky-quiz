@@ -3,13 +3,17 @@ package com.trickyquiz.backend.api.quiz;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.trickyquiz.backend.api.quiz.dto.QuizChoiceResponse;
 import com.trickyquiz.backend.api.quiz.dto.QuizQuestionResponse;
 import com.trickyquiz.backend.api.quiz.dto.QuizQuestionsResponse;
+import com.trickyquiz.backend.api.quiz.dto.QuizSubmitResponse;
+import com.trickyquiz.backend.api.quiz.dto.QuizSubmitAnswerResponse;
 import com.trickyquiz.backend.common.config.SecurityConfig;
 import com.trickyquiz.backend.domain.quiz.QuizService;
 import java.util.List;
@@ -65,5 +69,53 @@ class QuizControllerTest {
         mockMvc.perform(get("/api/quiz/questions")
                         .param("category", "GENERAL"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void submitResultReturnsQuizResult() throws Exception {
+        QuizSubmitResponse response = new QuizSubmitResponse(
+                1L,
+                "GENERAL",
+                7,
+                10,
+                82,
+                List.of(new QuizSubmitAnswerResponse(
+                        1L,
+                        "다음 중 과일은 무엇일까요?",
+                        11L,
+                        "사과",
+                        12L,
+                        "바나나",
+                        true,
+                        "과일 해설"
+                ))
+        );
+
+        when(quizService.submitResult(eq("test-user"), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/api/quiz/results")
+                        .with(user("test-user"))
+                        .contentType(APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "category": "GENERAL",
+                                  "elapsedSeconds": 82,
+                                  "answers": [
+                                    {
+                                      "questionId": 1,
+                                      "selectedChoiceId": 11
+                                    }
+                                  ]
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultId").value(1))
+                .andExpect(jsonPath("$.category").value("GENERAL"))
+                .andExpect(jsonPath("$.score").value(7))
+                .andExpect(jsonPath("$.totalCount").value(10))
+                .andExpect(jsonPath("$.elapsedSeconds").value(82))
+                .andExpect(jsonPath("$.answers[0].correct").value(true))
+                .andExpect(jsonPath("$.answers[0].correctChoiceText").value("바나나"));
     }
 }

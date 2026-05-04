@@ -2,6 +2,30 @@
 
 ## 2026-05-04
 
+### 퀴즈 결과 제출 API 구현
+
+작업 내용:
+
+- `POST /api/quiz/results` 결과 제출 API를 추가했습니다.
+- 제출 요청용 `QuizSubmitRequest`, `QuizSubmitAnswerRequest` DTO를 추가했습니다.
+- 제출 응답용 `QuizSubmitResponse`, `QuizSubmitAnswerResponse` DTO를 추가했습니다.
+- `QuizService`에서 사용자 식별, 정답 검증, 결과 저장, 답안 저장을 처리하도록 확장했습니다.
+- `ResponseStatusException`을 전역 예외 처리기에 추가해 404 응답이 JSON으로 내려가도록 맞췄습니다.
+- 컨트롤러 테스트와 서비스 테스트를 추가했습니다.
+
+확인한 내용:
+
+- 답안 개수가 10개가 아니면 400으로 처리합니다.
+- 존재하지 않는 문제 또는 선택지는 404로 처리합니다.
+- 제출 결과에는 문제별 정답 선택지, 사용자가 고른 선택지, 해설이 포함됩니다.
+- `QuizServiceTest`, `QuizControllerTest`가 통과했습니다.
+
+현재 상태:
+
+- 퀴즈 시작 API 다음 흐름인 결과 저장 API가 준비되었습니다.
+- 로컬 PostgreSQL이 실행되지 않아 전체 `mvn test`는 아직 끝까지 돌리지 못했습니다.
+- 선택한 테스트만 돌리면 코드와 컨트롤러는 정상 동작합니다.
+
 ### 퀴즈 시작 API 구현
 
 작업 내용:
