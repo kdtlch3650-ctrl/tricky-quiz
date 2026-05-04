@@ -2,6 +2,30 @@
 
 ## 2026-05-04
 
+### 백엔드 기본 구조 구현
+
+작업 내용:
+
+- `api`, `common`, `domain` 기준의 백엔드 패키지 구조를 추가했습니다.
+- `/api/health` Health Check API를 추가했습니다.
+- 공통 에러 응답 DTO인 `ErrorResponse`를 추가했습니다.
+- 전역 예외 처리 클래스인 `GlobalExceptionHandler`를 추가했습니다.
+- 공개 API와 보호 API를 구분하기 위한 기본 `SecurityConfig`를 추가했습니다.
+- Health Check API 테스트를 추가했습니다.
+
+확인한 내용:
+
+- 최초 테스트에서 `/api/health`가 Spring Security 기본 설정 때문에 401로 막히는 것을 확인했습니다.
+- `/api/health`, `/api/categories`, `/api/rankings`를 공개 API로 설정했습니다.
+- `mvn test`가 성공했습니다.
+- 백엔드 서버 실행 후 `http://127.0.0.1:8080/api/health`가 200 응답을 반환했습니다.
+
+현재 상태:
+
+- 백엔드 서버의 기본 패키지 구조가 준비되었습니다.
+- 서버 상태 확인용 `/api/health` API가 준비되었습니다.
+- 실제 퀴즈 API, DB 엔티티, Google 로그인 구현은 아직 진행하지 않았습니다.
+
 ### 프론트엔드 정적 화면 구현
 
 작업 내용:
