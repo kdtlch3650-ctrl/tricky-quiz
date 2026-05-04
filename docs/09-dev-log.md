@@ -29,7 +29,7 @@
 | `npm install` 실행 실패 | npm 패키지를 내려받기 위한 네트워크 접근이 제한됨 | 승인 실행으로 프론트엔드 의존성 설치 |
 | Maven Wrapper 실행 실패 | 사용자 홈의 `.m2` 폴더에 wrapper 파일을 생성할 권한이 제한됨 | 설치된 Maven 명령어인 `mvn`으로 대체 실행 |
 | 백엔드 테스트 실패 | JPA 의존성이 있는데 DB 접속 설정이 없어서 `DataSource`를 만들 수 없음 | `application.properties`에 PostgreSQL 접속 기본값 추가 |
-| `docker compose up -d` 실행 실패 | Docker Desktop 엔진이 실행 중이 아님 | Docker Desktop 실행 후 다시 확인 예정 |
+| `docker compose up -d` 실행 실패 | Docker Desktop 엔진이 실행 중이 아니거나 현재 실행 권한에서 Docker API 접근이 제한됨 | Docker Desktop 실행 상태 확인 후 승인 실행으로 PostgreSQL 컨테이너 실행 |
 | 프론트엔드 빌드 실패 | Vite 내부 프로세스 실행이 권한 제한으로 막힘 | 승인 실행으로 `npm run build` 재실행 |
 | 백엔드 패키징 실패 | Maven 플러그인을 사용자 홈 `.m2`에 내려받는 과정에서 권한 제한 발생 | 승인 실행으로 `mvn -DskipTests package` 재실행 |
 
@@ -37,12 +37,12 @@
 
 - 프론트엔드 프로젝트는 생성과 빌드 확인이 완료되었습니다.
 - 백엔드 프로젝트는 생성과 패키징 확인이 완료되었습니다.
-- DB 실행 확인은 Docker Desktop 실행 후 다시 진행해야 합니다.
-- 백엔드 테스트는 DB가 실행된 뒤 다시 확인해야 합니다.
+- PostgreSQL 컨테이너 실행 확인이 완료되었습니다.
+- 백엔드 테스트가 성공했습니다.
 
 다음 작업:
 
-1. Docker Desktop 실행
-2. `docker compose up -d`로 PostgreSQL 실행 확인
-3. `mvn test`로 백엔드 테스트 확인
-4. 초기 세팅 작업 커밋
+1. 현재 확인 결과 커밋
+2. 프론트엔드 개발 서버 실행 확인
+3. 백엔드 서버 실행 확인
+4. 2단계 프론트엔드 정적 화면 구현 시작
