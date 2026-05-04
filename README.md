@@ -132,6 +132,7 @@ npm run dev
 | [DB 설계서](./docs/06-database-design.md) | 테이블 구조, 관계, 저장 흐름 정리 |
 | [API 명세서](./docs/07-api-spec.md) | API 목록, 요청, 응답, 인증 기준 정리 |
 | [개발 로드맵](./docs/08-roadmap.md) | 단계별 개발 순서와 완료 기준 정리 |
+| [개발 기록](./docs/09-dev-log.md) | 작업 내용, 문제 원인, 해결 과정 정리 |
 
 ## 외부 설계 링크
 
