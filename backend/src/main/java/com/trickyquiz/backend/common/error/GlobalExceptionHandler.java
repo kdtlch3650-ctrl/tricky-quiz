@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+// Controller에서 발생한 예외를 한 곳에서 JSON 응답으로 바꾸는 전역 예외 처리기입니다.
 public class GlobalExceptionHandler {
 
+    // @Valid 검증 실패처럼 요청 형식이 맞지 않는 경우를 처리합니다.
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException() {
         return ResponseEntity
@@ -16,6 +18,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("요청 값이 올바르지 않습니다."));
     }
 
+    // 지원하지 않는 카테고리처럼 비즈니스 규칙에 맞지 않는 요청을 처리합니다.
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
         return ResponseEntity
@@ -23,6 +26,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(exception.getMessage()));
     }
 
+    // 예상하지 못한 예외가 사용자에게 상세히 노출되지 않도록 공통 메시지로 처리합니다.
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException() {
         return ResponseEntity
