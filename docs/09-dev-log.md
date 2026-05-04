@@ -1,5 +1,24 @@
 # 개발 기록
 
+## 2026-05-05
+
+### Google OAuth 로그인 연동
+
+작업 내용:
+
+- Spring Security OAuth2 로그인 흐름을 추가했습니다.
+- 로그인 성공 후 프론트엔드 루트로 돌아오도록 성공 처리기를 연결했습니다.
+- `/api/me`가 Google OAuth 사용자 정보를 읽고, 로컬 `users` 테이블에 없으면 신규 사용자를 생성하도록 바꿨습니다.
+- 프론트엔드 로그인 버튼이 백엔드 OAuth 시작 URL로 이동하도록 수정했습니다.
+- 실제 비밀값 없이도 슬라이스 테스트가 동작하도록 테스트 전용 OAuth 클라이언트 설정을 추가했습니다.
+
+확인한 내용:
+
+- `mvn "-Dtest=UserControllerTest,HealthControllerTest,CategoryControllerTest,QuizControllerTest,RankingControllerTest,QuizServiceTest,RankingServiceTest" test`가 성공했습니다.
+- `npm run build`가 성공했습니다.
+- 런타임에는 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`가 필요합니다.
+- 로그인 성공 후에는 프론트엔드 루트로 돌아와서 퀴즈 시작을 다시 시도할 수 있습니다.
+
 ## 2026-05-04
 
 ### 사용자 정보 조회 및 상단 표시 연결

@@ -18,6 +18,8 @@ import './App.css'
 type Screen = 'home' | 'login' | 'categories' | 'quiz' | 'result' | 'ranking'
 type Category = CategoryItem
 
+const backendOrigin = import.meta.env.VITE_BACKEND_ORIGIN ?? 'http://localhost:8080'
+
 const fallbackCategories: Category[] = [
   {
     code: 'GENERAL',
@@ -147,8 +149,7 @@ function App() {
   }
 
   const handleLogin = () => {
-    setLoggedIn(true)
-    setScreen('categories')
+    window.location.assign(`${backendOrigin}/oauth2/authorization/google`)
   }
 
   useEffect(() => {
@@ -304,7 +305,7 @@ function App() {
                 Google OAuth 로그인으로 이동하고, 로그인 후 사용자 정보를 상단에 표시합니다.
               </p>
               <button className="google-button" type="button" onClick={handleLogin}>
-                Google로 계속하기
+                Google 계정으로 로그인
               </button>
             </div>
           </section>
