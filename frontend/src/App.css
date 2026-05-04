@@ -305,6 +305,12 @@
   border-top: 0;
 }
 
+.ranking-row.empty {
+  display: flex;
+  justify-content: center;
+  color: var(--muted);
+}
+
 .ranking-row.heading {
   color: var(--muted);
   background: var(--soft);

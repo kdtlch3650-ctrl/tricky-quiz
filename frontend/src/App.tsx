@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { getRankings, type CategoryCode, type RankingEntry } from './api'
 import './App.css'
 
 type Screen = 'home' | 'login' | 'categories' | 'quiz' | 'result' | 'ranking'
-
-type CategoryCode = 'GENERAL' | 'IT' | 'SCIENCE' | 'LIFE'
 
 type Category = {
   code: CategoryCode
@@ -17,15 +16,6 @@ type Question = {
   choices: string[]
   answerIndex: number
   explanation: string
-}
-
-type Ranking = {
-  rank: number
-  nickname: string
-  score: number
-  totalCount: number
-  elapsedSeconds: number
-  playedAt: string
 }
 
 const categories: Category[] = [
@@ -124,33 +114,6 @@ const sampleQuestions: Question[] = [
   },
 ]
 
-const rankings: Ranking[] = [
-  {
-    rank: 1,
-    nickname: '퀴즈고수',
-    score: 10,
-    totalCount: 10,
-    elapsedSeconds: 58,
-    playedAt: '2026-05-04 18:00',
-  },
-  {
-    rank: 2,
-    nickname: '헷갈림제로',
-    score: 9,
-    totalCount: 10,
-    elapsedSeconds: 64,
-    playedAt: '2026-05-04 17:40',
-  },
-  {
-    rank: 3,
-    nickname: '가볍게한판',
-    score: 8,
-    totalCount: 10,
-    elapsedSeconds: 71,
-    playedAt: '2026-05-04 17:10',
-  },
-]
-
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [loggedIn, setLoggedIn] = useState(false)
@@ -158,6 +121,9 @@ function App() {
   const [questionIndex, setQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [notice, setNotice] = useState('')
+  const [rankingEntries, setRankingEntries] = useState<RankingEntry[]>([])
+  const [rankingLoading, setRankingLoading] = useState(false)
+  const [rankingError, setRankingError] = useState('')
 
   const currentCategory = categories.find(
     (category) => category.code === selectedCategory,
@@ -202,6 +168,43 @@ function App() {
     setLoggedIn(true)
     setScreen('categories')
   }
+
+  useEffect(() => {
+    if (screen !== 'ranking') {
+      return
+    }
+
+    let cancelled = false
+
+    const loadRankings = async () => {
+      setRankingLoading(true)
+      setRankingError('')
+
+      try {
+        const response = await getRankings(selectedCategory)
+        if (!cancelled) {
+          setRankingEntries(response.rankings)
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setRankingEntries([])
+          setRankingError(
+            error instanceof Error ? error.message : '랭킹을 불러오지 못했습니다.',
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setRankingLoading(false)
+        }
+      }
+    }
+
+    void loadRankings()
+
+    return () => {
+      cancelled = true
+    }
+  }, [screen, selectedCategory])
 
   return (
     <div className="app-shell">
@@ -449,6 +452,8 @@ function App() {
                 </button>
               ))}
             </div>
+            {rankingLoading && <p className="notice">랭킹을 불러오는 중입니다.</p>}
+            {rankingError && <p className="notice">{rankingError}</p>}
             <div className="ranking-table" role="table" aria-label="랭킹 목록">
               <div className="ranking-row heading" role="row">
                 <span>순위</span>
@@ -457,7 +462,12 @@ function App() {
                 <span>시간</span>
                 <span>일시</span>
               </div>
-              {rankings.map((ranking) => (
+              {!rankingLoading && rankingEntries.length === 0 && !rankingError ? (
+                <div className="ranking-row empty" role="row">
+                  <span>아직 기록이 없습니다.</span>
+                </div>
+              ) : null}
+              {rankingEntries.map((ranking) => (
                 <div className="ranking-row" role="row" key={ranking.rank}>
                   <span>{ranking.rank}</span>
                   <span>{ranking.nickname}</span>
@@ -465,7 +475,7 @@ function App() {
                     {ranking.score}/{ranking.totalCount}
                   </span>
                   <span>{ranking.elapsedSeconds}초</span>
-                  <span>{ranking.playedAt}</span>
+                  <span>{formatPlayedAt(ranking.playedAt)}</span>
                 </div>
               ))}
             </div>
@@ -482,6 +492,22 @@ function App() {
       </main>
     </div>
   )
+}
+
+function formatPlayedAt(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date)
 }
 
 export default App
