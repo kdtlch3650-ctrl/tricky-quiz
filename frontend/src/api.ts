@@ -6,6 +6,54 @@ export type CategoryItem = {
   description: string
 }
 
+export type QuizChoice = {
+  id: number
+  text: string
+}
+
+export type QuizQuestion = {
+  id: number
+  questionText: string
+  choices: QuizChoice[]
+}
+
+export type QuizQuestionsResponse = {
+  category: CategoryCode
+  totalCount: number
+  questions: QuizQuestion[]
+}
+
+export type QuizSubmitAnswerRequest = {
+  questionId: number
+  selectedChoiceId: number
+}
+
+export type QuizSubmitRequest = {
+  category: CategoryCode
+  elapsedSeconds: number
+  answers: QuizSubmitAnswerRequest[]
+}
+
+export type QuizSubmitAnswerResponse = {
+  questionId: number
+  questionText: string
+  selectedChoiceId: number
+  selectedChoiceText: string
+  correctChoiceId: number
+  correctChoiceText: string
+  correct: boolean
+  explanation: string
+}
+
+export type QuizSubmitResponse = {
+  resultId: number
+  category: CategoryCode
+  score: number
+  totalCount: number
+  elapsedSeconds: number
+  answers: QuizSubmitAnswerResponse[]
+}
+
 export type RankingEntry = {
   rank: number
   nickname: string
@@ -31,11 +79,14 @@ type ApiErrorResponse = {
   message?: string
 }
 
-async function fetchJson<T>(path: string): Promise<T> {
+async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const { headers: initHeaders, ...restInit } = init ?? {}
+  const headers = new Headers(initHeaders)
+  headers.set('Accept', 'application/json')
+
   const response = await fetch(path, {
-    headers: {
-      Accept: 'application/json',
-    },
+    headers,
+    ...restInit,
   })
 
   if (!response.ok) {
@@ -75,4 +126,24 @@ export function getCurrentUser(): Promise<CurrentUser> {
  */
 export function getCategories(): Promise<CategoryItem[]> {
   return fetchJson<CategoryItem[]>('/api/categories')
+}
+
+/**
+ * 퀴즈 문제 목록을 가져옵니다.
+ */
+export function getQuizQuestions(category: CategoryCode): Promise<QuizQuestionsResponse> {
+  return fetchJson<QuizQuestionsResponse>(`/api/quiz/questions?category=${category}`)
+}
+
+/**
+ * 퀴즈 결과를 제출합니다.
+ */
+export function submitQuizResult(request: QuizSubmitRequest): Promise<QuizSubmitResponse> {
+  return fetchJson<QuizSubmitResponse>('/api/quiz/results', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  })
 }
