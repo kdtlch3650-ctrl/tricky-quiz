@@ -2,6 +2,31 @@
 
 ## 2026-05-04
 
+### DB 연결 및 엔티티 구현
+
+작업 내용:
+
+- Flyway 의존성을 추가했습니다.
+- `V1__create_quiz_tables.sql` 마이그레이션 파일을 추가했습니다.
+- `users`, `quiz_questions`, `quiz_choices`, `quiz_results`, `quiz_answers` 테이블 생성 SQL을 작성했습니다.
+- 사용자, 문제, 선택지, 결과, 답안 엔티티를 추가했습니다.
+- 카테고리와 로그인 제공자를 enum으로 정의했습니다.
+- 각 엔티티에 대응하는 Repository를 추가했습니다.
+- Repository 저장/조회 테스트를 추가했습니다.
+
+확인한 내용:
+
+- `spring.jpa.hibernate.ddl-auto=validate` 설정을 유지했습니다.
+- `mvn test`가 성공했습니다.
+- PostgreSQL에 `flyway_schema_history` 테이블이 생성된 것을 확인했습니다.
+- PostgreSQL에 `users`, `quiz_questions`, `quiz_choices`, `quiz_results`, `quiz_answers` 테이블이 생성된 것을 확인했습니다.
+
+현재 상태:
+
+- DB 테이블 생성은 Hibernate 자동 생성이 아니라 Flyway SQL로 관리합니다.
+- JPA 엔티티는 Flyway가 만든 테이블과 매핑됩니다.
+- 초기 문제 데이터 삽입과 실제 API 구현은 아직 진행하지 않았습니다.
+
 ### 백엔드 기본 구조 구현
 
 작업 내용:
