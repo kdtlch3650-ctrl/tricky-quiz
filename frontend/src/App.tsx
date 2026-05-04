@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getRankings, type CategoryCode, type RankingEntry } from './api'
+import { getCurrentUser, getRankings, type CategoryCode, type CurrentUser, type RankingEntry } from './api'
 import './App.css'
 
 type Screen = 'home' | 'login' | 'categories' | 'quiz' | 'result' | 'ranking'
@@ -124,6 +124,7 @@ function App() {
   const [rankingEntries, setRankingEntries] = useState<RankingEntry[]>([])
   const [rankingLoading, setRankingLoading] = useState(false)
   const [rankingError, setRankingError] = useState('')
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
 
   const currentCategory = categories.find(
     (category) => category.code === selectedCategory,
@@ -168,6 +169,31 @@ function App() {
     setLoggedIn(true)
     setScreen('categories')
   }
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadCurrentUser = async () => {
+      try {
+        const user = await getCurrentUser()
+        if (!cancelled) {
+          setCurrentUser(user)
+          setLoggedIn(true)
+        }
+      } catch {
+        if (!cancelled) {
+          setCurrentUser(null)
+          setLoggedIn(false)
+        }
+      }
+    }
+
+    void loadCurrentUser()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (screen !== 'ranking') {
@@ -220,7 +246,7 @@ function App() {
             랭킹
           </button>
           {loggedIn ? (
-            <span className="user-chip">사용자</span>
+            <span className="user-chip">{currentUser?.nickname ?? '사용자'}</span>
           ) : (
             <button type="button" onClick={() => setScreen('login')}>
               로그인
@@ -272,8 +298,7 @@ function App() {
               <p className="eyebrow">로그인 필요</p>
               <h1>퀴즈 결과 저장을 위해 로그인이 필요합니다.</h1>
               <p className="lead">
-                실제 구현 단계에서는 Google OAuth 로그인 화면으로 이동합니다.
-                지금은 정적 화면 확인을 위해 임시 로그인 버튼으로 진행합니다.
+                Google OAuth 로그인으로 이동하고, 로그인 후 사용자 정보를 상단에 표시합니다.
               </p>
               <button className="google-button" type="button" onClick={handleLogin}>
                 Google로 계속하기

@@ -14,6 +14,13 @@ export type RankingResponse = {
   rankings: RankingEntry[]
 }
 
+export type CurrentUser = {
+  id: number
+  email: string
+  nickname: string
+  provider: string
+}
+
 type ApiErrorResponse = {
   message?: string
 }
@@ -48,4 +55,11 @@ async function fetchJson<T>(path: string): Promise<T> {
  */
 export function getRankings(category: CategoryCode): Promise<RankingResponse> {
   return fetchJson<RankingResponse>(`/api/rankings?category=${category}`)
+}
+
+/**
+ * 현재 로그인한 사용자의 정보를 가져옵니다.
+ */
+export function getCurrentUser(): Promise<CurrentUser> {
+  return fetchJson<CurrentUser>('/api/me')
 }
