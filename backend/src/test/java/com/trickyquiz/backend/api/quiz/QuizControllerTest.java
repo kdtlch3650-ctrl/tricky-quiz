@@ -2,8 +2,8 @@ package com.trickyquiz.backend.api.quiz;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.trickyquiz.backend.api.quiz.dto.QuizChoiceResponse;
 import com.trickyquiz.backend.api.quiz.dto.QuizQuestionResponse;
 import com.trickyquiz.backend.api.quiz.dto.QuizQuestionsResponse;
-import com.trickyquiz.backend.api.quiz.dto.QuizSubmitResponse;
 import com.trickyquiz.backend.api.quiz.dto.QuizSubmitAnswerResponse;
+import com.trickyquiz.backend.api.quiz.dto.QuizSubmitResponse;
 import com.trickyquiz.backend.common.config.SecurityConfig;
 import com.trickyquiz.backend.domain.quiz.QuizService;
 import java.util.List;
@@ -41,10 +41,10 @@ class QuizControllerTest {
                 1,
                 List.of(new QuizQuestionResponse(
                         1L,
-                        "다음 중 과일은 무엇일까요?",
+                        "Dolphins are fish.",
                         List.of(
-                                new QuizChoiceResponse(10L, "자동차"),
-                                new QuizChoiceResponse(11L, "사과")
+                                new QuizChoiceResponse(10L, "O"),
+                                new QuizChoiceResponse(11L, "X")
                         )
                 ))
         );
@@ -58,9 +58,9 @@ class QuizControllerTest {
                 .andExpect(jsonPath("$.category").value("GENERAL"))
                 .andExpect(jsonPath("$.totalCount").value(1))
                 .andExpect(jsonPath("$.questions[0].id").value(1))
-                .andExpect(jsonPath("$.questions[0].questionText").value("다음 중 과일은 무엇일까요?"))
+                .andExpect(jsonPath("$.questions[0].questionText").value("Dolphins are fish."))
                 .andExpect(jsonPath("$.questions[0].choices[0].id").value(10))
-                .andExpect(jsonPath("$.questions[0].choices[0].text").value("자동차"))
+                .andExpect(jsonPath("$.questions[0].choices[0].text").value("O"))
                 .andExpect(jsonPath("$.questions[0].choices[0].correct").doesNotExist());
     }
 
@@ -81,13 +81,13 @@ class QuizControllerTest {
                 82,
                 List.of(new QuizSubmitAnswerResponse(
                         1L,
-                        "다음 중 과일은 무엇일까요?",
+                        "Dolphins are fish.",
                         11L,
-                        "사과",
+                        "X",
                         12L,
-                        "바나나",
+                        "O",
                         true,
-                        "과일 해설"
+                        "Dolphins are mammals."
                 ))
         );
 
@@ -116,6 +116,6 @@ class QuizControllerTest {
                 .andExpect(jsonPath("$.totalCount").value(10))
                 .andExpect(jsonPath("$.elapsedSeconds").value(82))
                 .andExpect(jsonPath("$.answers[0].correct").value(true))
-                .andExpect(jsonPath("$.answers[0].correctChoiceText").value("바나나"));
+                .andExpect(jsonPath("$.answers[0].correctChoiceText").value("O"));
     }
 }

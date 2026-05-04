@@ -24,22 +24,22 @@ const fallbackCategories: Category[] = [
   {
     code: 'GENERAL',
     name: '상식',
-    description: '가볍게 풀 수 있는 일반 상식 문제',
+    description: '헷갈리게 만든 일반 상식 문제',
   },
   {
     code: 'IT',
     name: 'IT',
-    description: '개발, 컴퓨터, 인터넷 관련 문제',
+    description: '개발, 컴퓨터, 인터넷 함정 문제',
   },
   {
     code: 'SCIENCE',
     name: '과학',
-    description: '생활 속 과학과 기초 과학 문제',
+    description: '생활 속 과학과 기초 과학 함정 문제',
   },
   {
     code: 'LIFE',
     name: '생활',
-    description: '일상 상황과 생활 정보 문제',
+    description: '일상 상황과 생활 정보 함정 문제',
   },
 ]
 
@@ -264,10 +264,10 @@ function App() {
         {screen === 'home' && (
           <section className="hero-section">
             <div className="hero-copy">
-              <p className="eyebrow">10문제 챌린지 퀴즈</p>
-              <h1>트릭퀴즈는 상식형으로 가볍게 풀어보세요.</h1>
+              <p className="eyebrow">10문제 함정 퀴즈</p>
+              <h1>트릭퀴즈는 보기에서 한 번 더 헷갈리게 만듭니다.</h1>
               <p className="lead">
-                짧은 시간에 문제를 풀고 점수와 순위를 확인하는 웹 퀴즈 프로젝트입니다.
+                정답은 단순한데 보기가 헷갈리는, 포트폴리오용 함정 퀴즈 프로젝트입니다.
               </p>
               <div className="button-row">
                 <button className="primary-button" type="button" onClick={goQuizStart}>
@@ -289,8 +289,8 @@ function App() {
                 <span>문제</span>
               </div>
               <div>
-                <strong>순위</strong>
-                <span>실시간 비교</span>
+                <strong>트릭</strong>
+                <span>함정 비교</span>
               </div>
             </div>
           </section>
@@ -300,12 +300,12 @@ function App() {
           <section className="center-section">
             <div className="narrow-panel">
               <p className="eyebrow">로그인 필요</p>
-              <h1>퀴즈 결과 저장을 위해 로그인이 필요합니다.</h1>
+              <h1>퀴즈 결과 저장과 랭킹 반영을 위해 로그인이 필요합니다.</h1>
               <p className="lead">
                 Google OAuth 로그인으로 이동하고, 로그인 후 사용자 정보를 상단에 표시합니다.
               </p>
               <button className="google-button" type="button" onClick={handleLogin}>
-                Google 계정으로 로그인
+                Google 계정으로 시작
               </button>
             </div>
           </section>
@@ -315,7 +315,7 @@ function App() {
           <section className="page-section">
             <div className="section-heading">
               <p className="eyebrow">카테고리 선택</p>
-              <h1>오늘 풀 주제와 문제를 골라주세요.</h1>
+              <h1>오늘은 어떤 함정부터 풀어볼까요?</h1>
             </div>
             <div className="category-grid">
               {categories.map((category) => (
@@ -337,7 +337,7 @@ function App() {
             {quizError && <p className="notice">{quizError}</p>}
             <div className="button-row">
               <button className="primary-button" type="button" onClick={startQuiz} disabled={quizLoading}>
-                {quizLoading ? '불러오는 중...' : `${currentCategory?.name ?? selectedCategory} 퀴즈 시작`}
+                {quizLoading ? '불러오는 중...' : `${currentCategory?.name ?? selectedCategory} 함정 퀴즈 시작`}
               </button>
             </div>
           </section>
@@ -347,7 +347,7 @@ function App() {
           <section className="page-section quiz-layout">
             <div className="quiz-header">
               <div>
-                <p className="eyebrow">{currentCategory?.name ?? selectedCategory} 퀴즈</p>
+                <p className="eyebrow">{currentCategory?.name ?? selectedCategory} 함정 퀴즈</p>
                 <h1>
                   {questionIndex + 1} / {quizQuestions.length}
                 </h1>
@@ -368,8 +368,9 @@ function App() {
             {currentQuestion ? (
               <article className="question-panel">
                 <h2>{currentQuestion.questionText}</h2>
+                <p className="question-hint">O 또는 X로 판단하세요.</p>
                 <div className="choice-list">
-                  {currentQuestion.choices.map((choice, choiceIndex) => (
+                  {currentQuestion.choices.map((choice) => (
                     <button
                       className={
                         answers[currentQuestion.id] === choice.id
@@ -385,7 +386,6 @@ function App() {
                         }))
                       }
                     >
-                      <span>{choiceIndex + 1}</span>
                       {choice.text}
                     </button>
                   ))}
@@ -434,7 +434,7 @@ function App() {
                 {quizResult.score} / {quizResult.totalCount}점
               </h1>
               <p className="lead">
-                {displayCategory?.name ?? quizResult.category} 퀴즈를 {quizResult.elapsedSeconds}
+                {displayCategory?.name ?? quizResult.category} 함정 퀴즈를 {quizResult.elapsedSeconds}
                 초 만에 완료했습니다.
               </p>
               <div className="button-row">
@@ -478,7 +478,7 @@ function App() {
           <section className="page-section">
             <div className="section-heading">
               <p className="eyebrow">랭킹</p>
-              <h1>카테고리별 점수를 비교해보세요.</h1>
+              <h1>카테고리별 함정 점수를 비교해보세요.</h1>
             </div>
             <div className="tab-list" role="tablist" aria-label="랭킹 카테고리">
               {categories.map((category) => (
