@@ -1,5 +1,11 @@
 export type CategoryCode = 'GENERAL' | 'IT' | 'SCIENCE' | 'LIFE'
 
+export type CategoryItem = {
+  code: CategoryCode
+  name: string
+  description: string
+}
+
 export type RankingEntry = {
   rank: number
   nickname: string
@@ -62,4 +68,11 @@ export function getRankings(category: CategoryCode): Promise<RankingResponse> {
  */
 export function getCurrentUser(): Promise<CurrentUser> {
   return fetchJson<CurrentUser>('/api/me')
+}
+
+/**
+ * 카테고리 목록을 가져옵니다.
+ */
+export function getCategories(): Promise<CategoryItem[]> {
+  return fetchJson<CategoryItem[]>('/api/categories')
 }

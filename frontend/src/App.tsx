@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getCurrentUser, getRankings, type CategoryCode, type CurrentUser, type RankingEntry } from './api'
+import {
+  getCategories,
+  getCurrentUser,
+  getRankings,
+  type CategoryCode,
+  type CategoryItem,
+  type CurrentUser,
+  type RankingEntry,
+} from './api'
 import './App.css'
 
 type Screen = 'home' | 'login' | 'categories' | 'quiz' | 'result' | 'ranking'
-
-type Category = {
-  code: CategoryCode
-  name: string
-  description: string
-}
+type Category = CategoryItem
 
 type Question = {
   id: number
@@ -18,7 +21,7 @@ type Question = {
   explanation: string
 }
 
-const categories: Category[] = [
+const fallbackCategories: Category[] = [
   {
     code: 'GENERAL',
     name: '상식',
@@ -118,6 +121,7 @@ function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [loggedIn, setLoggedIn] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<CategoryCode>('GENERAL')
+  const [categories, setCategories] = useState<Category[]>(fallbackCategories)
   const [questionIndex, setQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [notice, setNotice] = useState('')
@@ -169,6 +173,29 @@ function App() {
     setLoggedIn(true)
     setScreen('categories')
   }
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadCategories = async () => {
+      try {
+        const response = await getCategories()
+        if (!cancelled) {
+          setCategories(response)
+        }
+      } catch {
+        if (!cancelled) {
+          setCategories(fallbackCategories)
+        }
+      }
+    }
+
+    void loadCategories()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
