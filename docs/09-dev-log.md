@@ -2,6 +2,29 @@
 
 ## 2026-05-04
 
+### 퀴즈 시작 API 구현
+
+작업 내용:
+
+- 퀴즈 시작용 `GET /api/quiz/questions?category=GENERAL` API를 추가했습니다.
+- `QuizController`를 추가해 요청을 받아 `QuizService`로 위임하도록 구성했습니다.
+- 문제 응답용 `QuizQuestionsResponse`, `QuizQuestionResponse`, `QuizChoiceResponse` DTO를 추가했습니다.
+- `QuizService`에서 카테고리 검증, 활성 문제 10개 선택, 선택지 조회를 처리하도록 구현했습니다.
+- 비로그인 요청이 API 환경에서 `401`으로 떨어지도록 `SecurityConfig`를 보완했습니다.
+- 컨트롤러 테스트와 서비스 테스트를 추가했습니다.
+
+확인한 내용:
+
+- 선택지 응답에는 정답 여부를 포함하지 않도록 했습니다.
+- 카테고리 값이 잘못되면 `IllegalArgumentException`을 던지도록 했습니다.
+- 출제 가능한 문제가 10개 미만이면 예외를 반환하도록 했습니다.
+- `mvn test`가 성공했습니다.
+
+현재 상태:
+
+- 퀴즈 시작 화면에 필요한 문제와 선택지 응답 구조가 준비되었습니다.
+- 다음 단계에서는 제출 API 또는 결과 저장 API로 확장할 수 있습니다.
+
 ### DB 연결 및 엔티티 구현
 
 작업 내용:

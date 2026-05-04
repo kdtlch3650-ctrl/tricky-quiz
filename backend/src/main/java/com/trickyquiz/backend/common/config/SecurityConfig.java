@@ -1,5 +1,6 @@
 package com.trickyquiz.backend.common.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +20,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/health", "/api/categories", "/api/rankings").permitAll()
                         // 위에서 공개하지 않은 API는 Spring Security가 로그인 여부를 검사합니다.
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        // API에서는 비로그인 요청을 로그인 페이지 이동이 아니라 401 응답으로 처리합니다.
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                        )
                 );
 
         return http.build();
