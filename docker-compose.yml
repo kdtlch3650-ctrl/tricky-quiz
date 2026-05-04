@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: tricky_quiz_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: tricky_quiz
+      POSTGRES_USER: tricky_quiz_user
+      POSTGRES_PASSWORD: tricky_quiz_password
+    volumes:
+      - tricky_quiz_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  tricky_quiz_postgres_data:
