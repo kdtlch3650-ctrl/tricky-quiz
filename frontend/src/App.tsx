@@ -4,6 +4,7 @@ import {
   getCurrentUser,
   getQuizQuestions,
   getRankings,
+  logoutCurrentUser,
   submitQuizResult,
   type CategoryCode,
   type CategoryItem,
@@ -64,6 +65,7 @@ function App() {
   const [rankingLoading, setRankingLoading] = useState(false)
   const [rankingError, setRankingError] = useState('')
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
+  const [logoutMenuOpen, setLogoutMenuOpen] = useState(false)
 
   const currentCategory = categories.find((category) => category.code === selectedCategory)
   const currentQuestion = quizQuestions[questionIndex]
@@ -180,6 +182,31 @@ function App() {
     window.location.assign(`${backendOrigin}/oauth2/authorization/google`)
   }
 
+  const handleLogout = async () => {
+    if (!loggedIn) {
+      return
+    }
+
+    try {
+      await logoutCurrentUser()
+      setLoggedIn(false)
+      setCurrentUser(null)
+      setScreen('home')
+      setNotice('')
+      setQuizError('')
+      setRankingError('')
+      setQuizQuestions([])
+      setQuestionIndex(0)
+      setAnswers({})
+      setQuizStartedAt(null)
+      setQuizResult(null)
+      setRankingEntries([])
+      setLogoutMenuOpen(false)
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : '로그아웃에 실패했습니다.')
+    }
+  }
+
   useEffect(() => {
     let cancelled = false
 
@@ -279,7 +306,24 @@ function App() {
             랭킹
           </button>
           {loggedIn ? (
-            <span className="user-chip">{currentUser?.nickname ?? '사용자'}</span>
+            <div className="user-menu">
+              <button
+                className="user-chip"
+                type="button"
+                aria-expanded={logoutMenuOpen}
+                aria-haspopup="menu"
+                onClick={() => setLogoutMenuOpen((value) => !value)}
+              >
+                {currentUser?.nickname ?? '사용자'}
+              </button>
+              {logoutMenuOpen && (
+                <div className="user-menu-panel" role="menu" aria-label="계정 메뉴">
+                  <button type="button" onClick={handleLogout}>
+                    로그아웃
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <button type="button" onClick={() => setScreen('login')}>
               로그인
