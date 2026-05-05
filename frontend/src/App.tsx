@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   getCategories,
   getCurrentUser,
@@ -66,6 +66,7 @@ function App() {
   const [rankingError, setRankingError] = useState('')
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
   const [logoutMenuOpen, setLogoutMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement | null>(null)
 
   const currentCategory = categories.find((category) => category.code === selectedCategory)
   const currentQuestion = quizQuestions[questionIndex]
@@ -231,6 +232,28 @@ function App() {
   }, [])
 
   useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!logoutMenuOpen) {
+        return
+      }
+
+      const target = event.target
+      if (!(target instanceof Node)) {
+        return
+      }
+
+      if (userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setLogoutMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [logoutMenuOpen])
+
+  useEffect(() => {
     let cancelled = false
 
     const loadCurrentUser = async () => {
@@ -306,7 +329,7 @@ function App() {
             랭킹
           </button>
           {loggedIn ? (
-            <div className="user-menu">
+            <div className="user-menu" ref={userMenuRef}>
               <button
                 className="user-chip"
                 type="button"

@@ -386,6 +386,29 @@ button:disabled {
     padding: 16px 20px;
   }
 
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .nav-actions > button {
+    flex: 1 1 0;
+  }
+
+  .user-menu {
+    width: 100%;
+    flex: 1 1 0;
+  }
+
+  .user-chip {
+    width: 100%;
+  }
+
+  .user-menu-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
   .hero-section {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -394,6 +417,19 @@ button:disabled {
 
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category-card {
+    min-height: 124px;
+    padding: 18px;
+  }
+
+  .category-card strong {
+    font-size: 20px;
+  }
+
+  .category-card span {
+    font-size: 14px;
   }
 
   .ranking-row {
@@ -414,7 +450,21 @@ button:disabled {
   }
 
   .category-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category-card {
+    min-height: 100px;
+    padding: 14px;
+  }
+
+  .category-card strong {
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .category-card span {
+    font-size: 12px;
   }
 
   .answer-item {
@@ -427,7 +477,12 @@ button:disabled {
   }
 
   .button-row > button,
-  .nav-actions > button {
+  .nav-actions > button,
+  .nav-actions > .user-menu {
     flex: 1 1 auto;
+  }
+
+  .topbar {
+    padding-inline: 14px;
   }
 }
