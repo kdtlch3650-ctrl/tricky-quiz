@@ -205,6 +205,12 @@
   padding: 28px;
 }
 
+.question-hint {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .choice-list {
   display: grid;
   gap: 12px;
@@ -303,6 +309,12 @@
 
 .ranking-row:first-child {
   border-top: 0;
+}
+
+.ranking-row.empty {
+  display: flex;
+  justify-content: center;
+  color: var(--muted);
 }
 
 .ranking-row.heading {

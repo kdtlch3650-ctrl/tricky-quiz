@@ -3,6 +3,7 @@ package com.trickyquiz.backend.common.error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,6 +25,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(new ErrorResponse(exception.getMessage()));
+    }
+
+    // 서비스 계층에서 상태 코드를 직접 지정한 경우를 그대로 응답합니다.
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException exception) {
+        String message = exception.getReason();
+        if (message == null || message.isBlank()) {
+            message = "요청을 처리할 수 없습니다.";
+        }
+
+        return ResponseEntity
+                .status(exception.getStatusCode())
+                .body(new ErrorResponse(message));
     }
 
     // 예상하지 못한 예외가 사용자에게 상세히 노출되지 않도록 공통 메시지로 처리합니다.

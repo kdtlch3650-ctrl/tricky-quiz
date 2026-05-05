@@ -70,7 +70,7 @@ class QuizRepositoryTest {
         assertThat(correctChoice.getId()).isNotNull();
         assertThat(result.getId()).isNotNull();
         assertThat(answer.getId()).isNotNull();
-        assertThat(quizQuestionRepository.findByCategoryAndActiveTrue(QuizCategory.GENERAL)).hasSize(1);
+        assertThat(quizQuestionRepository.findByCategoryAndActiveTrue(QuizCategory.GENERAL)).hasSize(21);
         assertThat(quizChoiceRepository.findByQuestionIdOrderByChoiceOrderAsc(question.getId()))
                 .extracting(QuizChoice::getChoiceText)
                 .containsExactly("대서양", "태평양");
