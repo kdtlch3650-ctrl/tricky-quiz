@@ -101,3 +101,5 @@ https://www.figma.com/board/WdNGANEuOwlQHiOKIhcYk6/%EC%A0%9C%EB%AA%A9-%EC%97%86%
 https://drive.google.com/file/d/1Skwmrr6G4MO5LNRt_-wZ00GbTrfBXWcg/view?usp=sharing
 - 테이블명세서
 https://docs.google.com/spreadsheets/d/1LcSbtoZYwTN2SffkXg9lTdyw1kV6wSQjgHjYmQSTzRI/edit?usp=sharing
+- 테스트케이스
+https://docs.google.com/spreadsheets/d/1mV7YmM_DHA_KmUq72hfjmdo5noZTF4epx7f-teHFLZM/edit?usp=sharing
