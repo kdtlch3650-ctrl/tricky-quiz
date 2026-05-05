@@ -79,15 +79,30 @@ type ApiErrorResponse = {
   message?: string
 }
 
+export class ApiError extends Error {
+  status: number
+
+  constructor(message: string, status = 0) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
   const { headers: initHeaders, ...restInit } = init ?? {}
   const headers = new Headers(initHeaders)
   headers.set('Accept', 'application/json')
 
-  const response = await fetch(path, {
-    headers,
-    ...restInit,
-  })
+  let response: Response
+  try {
+    response = await fetch(path, {
+      headers,
+      ...restInit,
+    })
+  } catch {
+    throw new ApiError('백엔드에 연결할 수 없습니다. 데모 모드를 사용할 수 있습니다.')
+  }
 
   if (!response.ok) {
     let message = `요청 실패: ${response.status}`
@@ -101,7 +116,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
       // 서버가 JSON을 주지 않으면 기본 메시지를 유지합니다.
     }
 
-    throw new Error(message)
+    throw new ApiError(message, response.status)
   }
 
   return (await response.json()) as T
