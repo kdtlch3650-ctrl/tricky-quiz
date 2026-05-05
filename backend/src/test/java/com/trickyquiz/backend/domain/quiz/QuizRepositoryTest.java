@@ -32,6 +32,10 @@ class QuizRepositoryTest {
 
     @Test
     void savesQuizResultWithAnswer() {
+        quizAnswerRepository.deleteAll();
+        quizResultRepository.deleteAll();
+        userRepository.deleteAll();
+
         User user = userRepository.save(new User(
                 AuthProvider.GOOGLE,
                 "google-user-1",

@@ -147,3 +147,20 @@ export function submitQuizResult(request: QuizSubmitRequest): Promise<QuizSubmit
     body: JSON.stringify(request),
   })
 }
+
+/**
+ * 현재 로그인 세션을 종료합니다.
+ */
+export async function logoutCurrentUser(): Promise<void> {
+  const response = await fetch('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`요청 실패: ${response.status}`)
+  }
+}

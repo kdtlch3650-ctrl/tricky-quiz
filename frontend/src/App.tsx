@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   getCategories,
   getCurrentUser,
   getQuizQuestions,
   getRankings,
+  logoutCurrentUser,
   submitQuizResult,
   type CategoryCode,
   type CategoryItem,
@@ -43,6 +44,10 @@ const fallbackCategories: Category[] = [
   },
 ]
 
+function calculateElapsedSeconds(startedAt: number) {
+  return Math.max(1, Math.round((Date.now() - startedAt) / 1000))
+}
+
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [loggedIn, setLoggedIn] = useState(false)
@@ -60,6 +65,8 @@ function App() {
   const [rankingLoading, setRankingLoading] = useState(false)
   const [rankingError, setRankingError] = useState('')
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
+  const [logoutMenuOpen, setLogoutMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement | null>(null)
 
   const currentCategory = categories.find((category) => category.code === selectedCategory)
   const currentQuestion = quizQuestions[questionIndex]
@@ -127,7 +134,7 @@ function App() {
 
     const payload: QuizSubmitRequest = {
       category: selectedCategory,
-      elapsedSeconds: Math.max(1, Math.round((Date.now() - quizStartedAt) / 1000)),
+      elapsedSeconds: calculateElapsedSeconds(quizStartedAt),
       answers: quizQuestions.map((question) => ({
         questionId: question.id,
         selectedChoiceId: answers[question.id]!,
@@ -148,8 +155,57 @@ function App() {
     }
   }
 
+  const handleChoiceSelect = (choiceId: number) => {
+    if (!currentQuestion) {
+      return
+    }
+
+    const selectedChoiceId = answers[currentQuestion.id]
+
+    if (selectedChoiceId === choiceId) {
+      if (questionIndex === quizQuestions.length - 1) {
+        void submitQuiz()
+        return
+      }
+
+      setNotice('')
+      setQuestionIndex((value) => value + 1)
+      return
+    }
+
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQuestion.id]: choiceId,
+    }))
+  }
+
   const handleLogin = () => {
     window.location.assign(`${backendOrigin}/oauth2/authorization/google`)
+  }
+
+  const handleLogout = async () => {
+    if (!loggedIn) {
+      return
+    }
+
+    try {
+      await logoutCurrentUser()
+      setLoggedIn(false)
+      setCurrentUser(null)
+      setScreen('home')
+      setNotice('')
+      setQuizError('')
+      setRankingError('')
+      setQuizQuestions([])
+      setQuestionIndex(0)
+      setAnswers({})
+      setQuizStartedAt(null)
+      setQuizResult(null)
+      setRankingEntries([])
+      setLogoutMenuOpen(false)
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : '로그아웃에 실패했습니다.')
+    }
   }
 
   useEffect(() => {
@@ -174,6 +230,28 @@ function App() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!logoutMenuOpen) {
+        return
+      }
+
+      const target = event.target
+      if (!(target instanceof Node)) {
+        return
+      }
+
+      if (userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setLogoutMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [logoutMenuOpen])
 
   useEffect(() => {
     let cancelled = false
@@ -251,7 +329,24 @@ function App() {
             랭킹
           </button>
           {loggedIn ? (
-            <span className="user-chip">{currentUser?.nickname ?? '사용자'}</span>
+            <div className="user-menu" ref={userMenuRef}>
+              <button
+                className="user-chip"
+                type="button"
+                aria-expanded={logoutMenuOpen}
+                aria-haspopup="menu"
+                onClick={() => setLogoutMenuOpen((value) => !value)}
+              >
+                {currentUser?.nickname ?? '사용자'}
+              </button>
+              {logoutMenuOpen && (
+                <div className="user-menu-panel" role="menu" aria-label="계정 메뉴">
+                  <button type="button" onClick={handleLogout}>
+                    로그아웃
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <button type="button" onClick={() => setScreen('login')}>
               로그인
@@ -266,9 +361,7 @@ function App() {
             <div className="hero-copy">
               <p className="eyebrow">10문제 함정 퀴즈</p>
               <h1>트릭퀴즈는 보기에서 한 번 더 헷갈리게 만듭니다.</h1>
-              <p className="lead">
-                정답은 단순한데 보기가 헷갈리는, 포트폴리오용 함정 퀴즈 프로젝트입니다.
-              </p>
+              <p className="lead">함정 같은 문제로 가볍게 즐기는 퀴즈</p>
               <div className="button-row">
                 <button className="primary-button" type="button" onClick={goQuizStart}>
                   퀴즈 시작
@@ -276,21 +369,6 @@ function App() {
                 <button className="secondary-button" type="button" onClick={() => setScreen('ranking')}>
                   랭킹 보기
                 </button>
-              </div>
-            </div>
-
-            <div className="summary-panel">
-              <div>
-                <strong>4</strong>
-                <span>카테고리</span>
-              </div>
-              <div>
-                <strong>10</strong>
-                <span>문제</span>
-              </div>
-              <div>
-                <strong>트릭</strong>
-                <span>함정 비교</span>
               </div>
             </div>
           </section>
@@ -379,12 +457,7 @@ function App() {
                       }
                       key={choice.id}
                       type="button"
-                      onClick={() =>
-                        setAnswers((prev) => ({
-                          ...prev,
-                          [currentQuestion.id]: choice.id,
-                        }))
-                      }
+                      onClick={() => handleChoiceSelect(choice.id)}
                     >
                       {choice.text}
                     </button>
@@ -398,7 +471,6 @@ function App() {
             )}
 
             {notice && <p className="notice">{notice}</p>}
-
             <div className="button-row between">
               <button
                 className="secondary-button"
@@ -408,20 +480,9 @@ function App() {
               >
                 이전
               </button>
-              {questionIndex < quizQuestions.length - 1 ? (
-                <button
-                  className="primary-button"
-                  type="button"
-                  disabled={quizLoading}
-                  onClick={() => setQuestionIndex((value) => value + 1)}
-                >
-                  다음
-                </button>
-              ) : (
-                <button className="primary-button" type="button" onClick={submitQuiz} disabled={quizLoading}>
-                  {quizLoading ? '제출 중...' : '제출'}
-                </button>
-              )}
+              <span className="progress-text">
+                같은 선택지를 한 번 더 누르면 다음 문제로 넘어갑니다.
+              </span>
             </div>
           </section>
         )}
