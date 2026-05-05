@@ -19,6 +19,18 @@
   backdrop-filter: blur(12px);
 }
 
+.demo-banner {
+  display: flex;
+  justify-content: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(46, 139, 147, 0.18);
+  color: #1d5f65;
+  background: linear-gradient(90deg, rgba(226, 247, 245, 0.92), rgba(241, 247, 255, 0.92));
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
 .brand {
   color: var(--ink);
   font-size: 20px;
@@ -386,6 +398,12 @@ button:disabled {
     padding: 16px 20px;
   }
 
+  .demo-banner {
+    justify-content: flex-start;
+    padding: 10px 20px;
+    text-align: left;
+  }
+
   .nav-actions {
     width: 100%;
     justify-content: flex-start;
@@ -484,5 +502,10 @@ button:disabled {
 
   .topbar {
     padding-inline: 14px;
+  }
+
+  .demo-banner {
+    padding-inline: 14px;
+    font-size: 13px;
   }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  ApiError,
   getCategories,
   getCurrentUser,
   getQuizQuestions,
@@ -14,12 +15,19 @@ import {
   type QuizSubmitResponse,
   type RankingEntry,
 } from './api'
+import {
+  DEMO_CURRENT_USER,
+  getDemoQuizQuestions,
+  getDemoRankings,
+  submitDemoQuizResult,
+} from './demoData'
 import './App.css'
 
 type Screen = 'home' | 'login' | 'categories' | 'quiz' | 'result' | 'ranking'
 type Category = CategoryItem
 
 const backendOrigin = import.meta.env.VITE_BACKEND_ORIGIN ?? 'http://localhost:8080'
+const demoModeForced = import.meta.env.VITE_DEMO_MODE === 'true'
 
 const fallbackCategories: Category[] = [
   {
@@ -51,6 +59,7 @@ function calculateElapsedSeconds(startedAt: number) {
 function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [loggedIn, setLoggedIn] = useState(false)
+  const [demoMode, setDemoMode] = useState(demoModeForced)
   const [selectedCategory, setSelectedCategory] = useState<CategoryCode>('GENERAL')
   const [categories, setCategories] = useState<Category[]>(fallbackCategories)
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
@@ -72,9 +81,28 @@ function App() {
   const currentQuestion = quizQuestions[questionIndex]
   const resultCategory = categories.find((category) => category.code === quizResult?.category)
   const displayCategory = resultCategory ?? currentCategory
+  const visibleRankingEntries = demoMode
+    ? getDemoRankings(selectedCategory).rankings
+    : rankingEntries
+  const visibleRankingLoading = demoMode ? false : rankingLoading
+  const visibleRankingError = demoMode ? '' : rankingError
+
+  const enterDemoSession = () => {
+    setLoggedIn(true)
+    setCurrentUser(DEMO_CURRENT_USER)
+    setLogoutMenuOpen(false)
+    setNotice('데모 모드로 실행 중입니다. 백엔드가 연결되면 실제 API를 사용합니다.')
+  }
 
   const goQuizStart = () => {
     if (!loggedIn) {
+      if (demoMode) {
+        enterDemoSession()
+        setQuizError('')
+        setScreen('categories')
+        return
+      }
+
       setScreen('login')
       return
     }
@@ -94,7 +122,9 @@ function App() {
     setNotice('')
 
     try {
-      const response = await getQuizQuestions(selectedCategory)
+      const response = demoMode
+        ? getDemoQuizQuestions(selectedCategory)
+        : await getQuizQuestions(selectedCategory)
       setQuizQuestions(response.questions)
       setQuestionIndex(0)
       setAnswers({})
@@ -145,7 +175,9 @@ function App() {
     setNotice('')
 
     try {
-      const response = await submitQuizResult(payload)
+      const response = demoMode
+        ? submitDemoQuizResult(payload)
+        : await submitQuizResult(payload)
       setQuizResult(response)
       setScreen('result')
     } catch (error) {
@@ -180,11 +212,35 @@ function App() {
   }
 
   const handleLogin = () => {
+    if (demoMode) {
+      enterDemoSession()
+      setQuizError('')
+      setScreen('categories')
+      return
+    }
+
     window.location.assign(`${backendOrigin}/oauth2/authorization/google`)
   }
 
   const handleLogout = async () => {
     if (!loggedIn) {
+      return
+    }
+
+    if (demoMode) {
+      setLoggedIn(false)
+      setCurrentUser(null)
+      setScreen('home')
+      setNotice('')
+      setQuizError('')
+      setRankingError('')
+      setQuizQuestions([])
+      setQuestionIndex(0)
+      setAnswers({})
+      setQuizStartedAt(null)
+      setQuizResult(null)
+      setRankingEntries([])
+      setLogoutMenuOpen(false)
       return
     }
 
@@ -209,6 +265,10 @@ function App() {
   }
 
   useEffect(() => {
+    if (demoModeForced) {
+      return
+    }
+
     let cancelled = false
 
     const loadCategories = async () => {
@@ -217,9 +277,12 @@ function App() {
         if (!cancelled) {
           setCategories(response)
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
           setCategories(fallbackCategories)
+          if (!(error instanceof ApiError && error.status === 401)) {
+            setDemoMode(true)
+          }
         }
       }
     }
@@ -254,6 +317,10 @@ function App() {
   }, [logoutMenuOpen])
 
   useEffect(() => {
+    if (demoModeForced) {
+      return
+    }
+
     let cancelled = false
 
     const loadCurrentUser = async () => {
@@ -263,8 +330,15 @@ function App() {
           setCurrentUser(user)
           setLoggedIn(true)
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
+          if (error instanceof ApiError && error.status === 401) {
+            setCurrentUser(null)
+            setLoggedIn(false)
+            return
+          }
+
+          setDemoMode(true)
           setCurrentUser(null)
           setLoggedIn(false)
         }
@@ -280,6 +354,10 @@ function App() {
 
   useEffect(() => {
     if (screen !== 'ranking') {
+      return
+    }
+
+    if (demoMode) {
       return
     }
 
@@ -300,6 +378,7 @@ function App() {
           setRankingError(
             error instanceof Error ? error.message : '랭킹을 불러오지 못했습니다.',
           )
+          setDemoMode(true)
         }
       } finally {
         if (!cancelled) {
@@ -313,7 +392,7 @@ function App() {
     return () => {
       cancelled = true
     }
-  }, [screen, selectedCategory])
+  }, [screen, selectedCategory, demoMode])
 
   return (
     <div className="app-shell">
@@ -348,12 +427,20 @@ function App() {
               )}
             </div>
           ) : (
-            <button type="button" onClick={() => setScreen('login')}>
-              로그인
+            <button
+              type="button"
+              onClick={demoMode ? handleLogin : () => setScreen('login')}
+            >
+              {demoMode ? '데모 시작' : '로그인'}
             </button>
           )}
         </nav>
       </header>
+      {demoMode && (
+        <div className="demo-banner" role="status">
+          데모 모드로 실행 중입니다. 백엔드가 연결되면 실제 API로 자동 전환됩니다.
+        </div>
+      )}
 
       <main>
         {screen === 'home' && (
@@ -377,13 +464,19 @@ function App() {
         {screen === 'login' && (
           <section className="center-section">
             <div className="narrow-panel">
-              <p className="eyebrow">로그인 필요</p>
-              <h1>퀴즈 결과 저장과 랭킹 반영을 위해 로그인이 필요합니다.</h1>
+              <p className="eyebrow">{demoMode ? '데모 모드' : '로그인 필요'}</p>
+              <h1>
+                {demoMode
+                  ? '백엔드 없이도 샘플 데이터로 바로 둘러볼 수 있습니다.'
+                  : '퀴즈 결과 저장과 랭킹 반영을 위해 로그인이 필요합니다.'}
+              </h1>
               <p className="lead">
-                Google OAuth 로그인으로 이동하고, 로그인 후 사용자 정보를 상단에 표시합니다.
+                {demoMode
+                  ? 'GitHub Pages처럼 정적 호스팅만 가능한 환경에서는 데모 모드로 전환됩니다.'
+                  : 'Google OAuth 로그인으로 이동하고, 로그인 후 사용자 정보를 상단에 표시합니다.'}
               </p>
               <button className="google-button" type="button" onClick={handleLogin}>
-                Google 계정으로 시작
+                {demoMode ? '데모 퀴즈로 시작' : 'Google 계정으로 시작'}
               </button>
             </div>
           </section>
@@ -553,8 +646,8 @@ function App() {
                 </button>
               ))}
             </div>
-            {rankingLoading && <p className="notice">랭킹을 불러오는 중입니다.</p>}
-            {rankingError && <p className="notice">{rankingError}</p>}
+            {visibleRankingLoading && <p className="notice">랭킹을 불러오는 중입니다.</p>}
+            {visibleRankingError && <p className="notice">{visibleRankingError}</p>}
             <div className="ranking-table" role="table" aria-label="랭킹 목록">
               <div className="ranking-row heading" role="row">
                 <span>순위</span>
@@ -563,12 +656,12 @@ function App() {
                 <span>시간</span>
                 <span>일시</span>
               </div>
-              {!rankingLoading && rankingEntries.length === 0 && !rankingError ? (
+              {!visibleRankingLoading && visibleRankingEntries.length === 0 && !visibleRankingError ? (
                 <div className="ranking-row empty" role="row">
                   <span>아직 기록이 없습니다.</span>
                 </div>
               ) : null}
-              {rankingEntries.map((ranking) => (
+              {visibleRankingEntries.map((ranking) => (
                 <div className="ranking-row" role="row" key={ranking.rank}>
                   <span>{ranking.rank}</span>
                   <span>{ranking.nickname}</span>
